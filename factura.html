@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .factura {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .dato {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .boton {
+            display: block;
+            margin: 10px 0;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .pdf {
+            background: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="factura">
+    <h2>🧾 Factura</h2>
+
+    <div class="dato" id="numero"></div>
+    <div class="dato" id="cliente"></div>
+    <div class="dato" id="total"></div>
+
+    <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
+    <button class="boton pdf" onclick="descargarPDF()">📥 Descargar PDF</button>
+</div>
+
+<script>
+    // 🔥 Obtener número desde URL
+    const params = new URLSearchParams(window.location.search);
+    const numero = params.get("num");
+
+    // 🔧 DATOS SIMULADOS (luego lo conectas a tu sistema)
+    const cliente = "Cliente Demo";
+    const total = "100.00";
+
+    document.getElementById("numero").innerText = numero;
+    document.getElementById("cliente").innerText = "Cliente: " + cliente;
+    document.getElementById("total").innerText = "Total: $" + total;
+
+    // 📲 WhatsApp
+    function enviarWhatsApp() {
+        let mensaje = `Factura N° ${numero} - Total: $${total}`;
+        window.open("https://wa.me/?text=" + encodeURIComponent(mensaje));
+    }
+
+    // 📥 PDF (simulado)
+    function descargarPDF() {
+        alert("Aquí luego conectarás tu PDF real");
+    }
+</script>
+
+</body>
+</html>
