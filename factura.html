@@ -64,37 +64,19 @@
 </div>
 
 <script>
-    // 🔥 Obtener número desde URL
-    const params = new URLSearchParams(window.location.search);
-    
-    const numero = params.get("num");
-    const total = params.get("total");
+const params = new URLSearchParams(window.location.search);
 
-    // 🔧 DATOS SIMULADOS (luego lo conectas a tu sistema)
-    const cliente = "Cliente Demo";
-    const total = "100.00";
+const numero = params.get("num") || "00000";
+const total = params.get("total") || "0";
 
-    document.getElementById("numero").innerText = numero;
-    document.getElementById("cliente").innerText = "Cliente: " + cliente;
-    document.getElementById("total").innerText = "Total: $" + total;
+document.getElementById("numero").innerText = numero;
 
-    // 📲 WhatsApp
-    function enviarWhatsApp() {
-        let mensaje = `Factura N° ${numero} - Total: $${total}`;
-        let url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
-
-        window.location.href = url;
-    }
-
-    // 📥 PDF (simulado)
-    function descargarPDF() {
-        alert("Aquí luego conectarás tu PDF real");
-    }
-</script>
-
-<script>
 function enviarWhatsApp() {
-    alert("CLICK FUNCIONA");
+    let mensaje = "Factura N° " + numero + " - Total: $" + total;
+
+    let url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
+
+    window.location.href = url;
 }
 </script>
     
