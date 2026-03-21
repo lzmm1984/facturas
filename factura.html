@@ -66,7 +66,9 @@
 <script>
     // 🔥 Obtener número desde URL
     const params = new URLSearchParams(window.location.search);
+    
     const numero = params.get("num");
+    const total = params.get("total");
 
     // 🔧 DATOS SIMULADOS (luego lo conectas a tu sistema)
     const cliente = "Cliente Demo";
