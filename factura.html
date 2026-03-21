@@ -81,9 +81,9 @@
     // 📲 WhatsApp
     function enviarWhatsApp() {
         let mensaje = `Factura N° ${numero} - Total: $${total}`;
-        let url = "https://wa.me/?text=" + encodeURIComponent(mensaje);
+        let url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
 
-        window.open(url, "_blank");
+        window.location.href = url;
     }
 
     // 📥 PDF (simulado)
