@@ -29,6 +29,23 @@
             font-size: 16px;
         }
 
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
         .boton {
             display: block;
             margin: 10px 0;
@@ -57,6 +74,20 @@
 
     <div class="dato" id="numero"></div>
     <div class="dato" id="cliente"></div>
+    <div class="dato" id="fecha"></div>
+    
+    <table id="tablaProductos">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cant</th>
+                <th>Sub Total</th>
+            </tr>
+        </thead>
+        <tbody id="lista">
+        </tbody>
+    </table>
+    
     <div class="dato" id="total"></div>
 
     <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
@@ -71,25 +102,28 @@ const fecha = params.get("fecha") || "Sin fecha";
 const total = params.get("total") || "0";
     
 const productosRaw = params.get("productos") || "";
+
+let tablaHtml = "";
 let mensajeProductosWhatsApp = "";
 
 if (productosRaw) {
-const filas = productosRaw.split("|");
-filas.forEach(fila => {
-   const datos = fila.split(",");
-   if (datos.length === 3) {
-      tablaHtml += `<tr><td>${datos[0]}</td><td>${datos[1]}</td><td>$${datos[2]}</td></tr>`;
-      mensajeProductosWhatsApp += `*Producto:* ${datos[0]}\n*Cantidad:* ${datos[1]}\n*Subtotal:* $${datos[2]}\n\n`;
-    }
- });
+    const filas = productosRaw.split("|");
+    filas.forEach(fila => {
+        const datos = fila.split(",");
+        if (datos.length === 3) {
+            tablaHtml += `<tr><td>${datos[0]}</td><td>${datos[1]}</td><td>$${datos[2]}</td></tr>`;
+            
+            mensajeProductosWhatsApp += `*Producto:* ${datos[0]}\n*Cantidad:* ${datos[1]}\n*Subtotal:* $${datos[2]}\n\n`;
+        }
+    });
 }
 
-    document.getElementById("numero").innerHTML = `<b>Factura N°:</b> ${numero}`;
-    document.getElementById("cliente").innerHTML = `<b>Cliente:</b> ${cliente}`;
-    document.getElementById("fecha").innerHTML = `<b>Fecha:</b> ${fecha}`;
-    document.getElementById("total").innerText = "Total: $" + total;
-    document.getElementById("lista").innerHTML = tablaHtml;
-    
+document.getElementById("numero").innerHTML = `<b>Factura N°:</b> ${numero}`;
+document.getElementById("cliente").innerHTML = `<b>Cliente:</b> ${cliente}`;
+document.getElementById("fecha").innerHTML = `<b>Fecha:</b> ${fecha}`;
+document.getElementById("total").innerHTML = `<b>Total: $${total}</b>`;
+document.getElementById("lista").innerHTML = tablaHtml;
+
 function enviarWhatsApp() {
     let mensaje = `📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
