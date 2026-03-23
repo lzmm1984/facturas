@@ -60,7 +60,6 @@
     <div class="dato" id="total"></div>
 
     <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
-    <button class="boton pdf" onclick="descargarPDF()">📥 Descargar PDF</button>
 </div>
 
 <script>
@@ -79,14 +78,17 @@ const filas = productosRaw.split("|");
 filas.forEach(fila => {
    const datos = fila.split(",");
    if (datos.length === 3) {
+      tablaHtml += `<tr><td>${datos[0]}</td><td>${datos[1]}</td><td>$${datos[2]}</td></tr>`;
       mensajeProductosWhatsApp += `*Producto:* ${datos[0]}\n*Cantidad:* ${datos[1]}\n*Subtotal:* $${datos[2]}\n\n`;
     }
  });
 }
 
-document.getElementById("numero").innerText = "Factura N°: " + numero;
-document.getElementById("cliente").innerText = "Cliente: " + cliente;
-document.getElementById("total").innerText = "Total: $" + total;
+    document.getElementById("numero").innerHTML = `<b>Factura N°:</b> ${numero}`;
+    document.getElementById("cliente").innerHTML = `<b>Cliente:</b> ${cliente}`;
+    document.getElementById("fecha").innerHTML = `<b>Fecha:</b> ${fecha}`;
+    document.getElementById("total").innerText = "Total: $" + total;
+    document.getElementById("lista").innerHTML = tablaHtml;
     
 function enviarWhatsApp() {
     let mensaje = `📄 *FACTURA*\n\n` +
