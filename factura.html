@@ -69,33 +69,39 @@ const params = new URLSearchParams(window.location.search);
 const numero = params.get("num") || "00000";
 const cliente = params.get("cliente") || "Consumidor Final";
 const fecha = params.get("fecha") || "Sin fecha";
-const producto = params.get("producto") || "Producto";
-const cantidad = params.get("cantidad") || "1";
-const subtotal = params.get("subtotal") || "0";
 const total = params.get("total") || "0";
+    
+const productosRaw = params.get("productos") || "";
+let tablaHtml = "";
+let mensajeProductosWhatsApp = "";
+
+if (productosRaw) {
+const filas = productosRaw.split("|");
+filas.forEach(fila => {
+   const datos = fila.split(",");
+   if (datos.length === 3) {
+      tablaHtml += `<tr><td>${datos[0]}</td><td>${datos[1]}</td><td>$${datos[2]}</td></tr>`;
+      mensajeProductosWhatsApp += `*Producto:* ${datos[0]}\n*Cantidad:* ${datos[1]}\n*Subtotal:* $${datos[2]}\n\n`;
+    }
+ });
+}
 
 document.getElementById("numero").innerText = "Factura N°: " + numero;
 document.getElementById("cliente").innerText = "Cliente: " + cliente;
 document.getElementById("total").innerText = "Total: $" + total;
+    
 function enviarWhatsApp() {
-    let mensaje =
-`🧾 FACTURA
+    let mensaje = `📄 *FACTURA*\n\n` +
+                  `*N°:* ${numero}\n` +
+                  `*Cliente:* ${cliente}\n` +
+                  `*Fecha:* ${fecha}\n\n` +
+                  `--------------------------\n` +
+                  `${mensajeProductosWhatsApp}` +
+                  `--------------------------\n` +
+                  `*TOTAL: $${total}*\n\n` +
+                  `¡Gracias por su compra!`;
 
-N°: ${numero}
-Cliente: ${cliente}
-Fecha: ${fecha}
-
-Producto: ${producto}
-Cantidad: ${cantidad}
-Subtotal: $${subtotal}
-
-TOTAL: $${total}
-
-¡Gracias por su compra!`;
-
-    let url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
-
-    window.location.href = url;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 </script>
     
