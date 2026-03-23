@@ -72,7 +72,6 @@ const fecha = params.get("fecha") || "Sin fecha";
 const total = params.get("total") || "0";
     
 const productosRaw = params.get("productos") || "";
-let tablaHtml = "";
 let mensajeProductosWhatsApp = "";
 
 if (productosRaw) {
@@ -80,7 +79,6 @@ const filas = productosRaw.split("|");
 filas.forEach(fila => {
    const datos = fila.split(",");
    if (datos.length === 3) {
-      tablaHtml += `<tr><td>${datos[0]}</td><td>${datos[1]}</td><td>$${datos[2]}</td></tr>`;
       mensajeProductosWhatsApp += `*Producto:* ${datos[0]}\n*Cantidad:* ${datos[1]}\n*Subtotal:* $${datos[2]}\n\n`;
     }
  });
