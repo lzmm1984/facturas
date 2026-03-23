@@ -15,7 +15,7 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            max-width: 400px;
+            max-width: 500px;
             margin: auto;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
@@ -61,9 +61,14 @@
             color: white;
         }
 
-        .pdf {
-            background: #007BFF;
-            color: white;
+        .debug {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 12px;
+            text-align: left;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -90,41 +95,94 @@
     
     <div class="dato" id="total"></div>
 
+    <!-- DEBUG INFO -->
+    <div class="debug">
+        <strong>🔍 DEBUG:</strong>
+        <div id="debug-productos"></div>
+        <div id="debug-count"></div>
+    </div>
+
     <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
 </div>
 
 <script>
+console.log("=== INICIO DEBUG ===");
+
 const params = new URLSearchParams(window.location.search);
 
 const numero = params.get("num") || "00000";
 const cliente = params.get("cliente") || "Consumidor Final";
 const fecha = params.get("fecha") || "Sin fecha";
 const total = params.get("total") || "0";
-    
 const productosRaw = params.get("productos") || "";
 
+// DEBUG: Mostrar todos los parámetros
+console.log("Número:", numero);
+console.log("Cliente:", cliente);
+console.log("Fecha:", fecha);
+console.log("Total:", total);
+console.log("Productos RAW:", productosRaw);
+console.log("Longitud productos:", productosRaw.length);
+
+// Mostrar en pantalla para debug
+document.getElementById("debug-productos").innerHTML = `Productos RAW: ${productosRaw}`;
+
+// Inicializar variables
 let tablaHtml = "";
 let mensajeProductosWhatsApp = "";
+let contadorProductos = 0;
 
-if (productosRaw) {
+if (productosRaw && productosRaw.length > 0) {
+    console.log("Procesando productos...");
     const filas = productosRaw.split("|");
-    filas.forEach(fila => {
+    console.log("Número de filas:", filas.length);
+    console.log("Filas:", filas);
+    
+    filas.forEach((fila, index) => {
+        console.log(`Procesando fila ${index}:`, fila);
         const datos = fila.split(",");
-        if (datos.length === 3) {
-            tablaHtml += `<tr><td>${datos[0]}</td><td>${datos[1]}</td><td>$${datos[2]}</td></tr>`;
+        console.log(`Datos de fila ${index}:`, datos);
+        
+        if (datos.length >= 3) {
+            const producto = datos[0].trim();
+            const cantidad = datos[1].trim();
+            const subtotal = datos[2].trim();
             
-            mensajeProductosWhatsApp += `*Producto:* ${datos[0]}\n*Cantidad:* ${datos[1]}\n*Subtotal:* $${datos[2]}\n\n`;
+            console.log(`Producto: ${producto}, Cantidad: ${cantidad}, Subtotal: ${subtotal}`);
+            
+            // Construir la tabla HTML
+            tablaHtml += `<tr><td>${producto}</td><td>${cantidad}</td><td>$${subtotal}</td></tr>`;
+            
+            // Construir el mensaje de WhatsApp
+            mensajeProductosWhatsApp += `*Producto:* ${producto}\n*Cantidad:* ${cantidad}\n*Subtotal:* $${subtotal}\n\n`;
+            
+            contadorProductos++;
+        } else {
+            console.log(`Fila ${index} tiene datos insuficientes:`, datos.length);
         }
     });
+} else {
+    console.log("No hay productos para procesar");
 }
 
+console.log("Total productos procesados:", contadorProductos);
+console.log("Mensaje WhatsApp:", mensajeProductosWhatsApp);
+console.log("=== FIN DEBUG ===");
+
+// Mostrar contador en debug
+document.getElementById("debug-count").innerHTML = `Productos encontrados: ${contadorProductos}`;
+
+// Actualizar el DOM
 document.getElementById("numero").innerHTML = `<b>Factura N°:</b> ${numero}`;
 document.getElementById("cliente").innerHTML = `<b>Cliente:</b> ${cliente}`;
 document.getElementById("fecha").innerHTML = `<b>Fecha:</b> ${fecha}`;
 document.getElementById("total").innerHTML = `<b>Total: $${total}</b>`;
-document.getElementById("lista").innerHTML = tablaHtml;
+document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3'>No hay productos</td></tr>";
 
 function enviarWhatsApp() {
+    console.log("Enviando WhatsApp...");
+    console.log("Mensaje productos:", mensajeProductosWhatsApp);
+    
     let mensaje = `📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
                   `*Cliente:* ${cliente}\n` +
@@ -134,7 +192,8 @@ function enviarWhatsApp() {
                   `--------------------------\n` +
                   `*TOTAL: $${total}*\n\n` +
                   `¡Gracias por su compra!`;
-
+    
+    console.log("Mensaje completo:", mensaje);
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 </script>
