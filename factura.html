@@ -67,12 +67,31 @@
 const params = new URLSearchParams(window.location.search);
 
 const numero = params.get("num") || "00000";
+const cliente = params.get("cliente") || "Consumidor Final";
+const fecha = params.get("fecha") || "Sin fecha";
+const producto = params.get("producto") || "Producto";
+const cantidad = params.get("cantidad") || "1";
+const subtotal = params.get("subtotal") || "0";
 const total = params.get("total") || "0";
 
-document.getElementById("numero").innerText = numero;
-
+document.getElementById("numero").innerText = "Factura N°: " + numero;
+document.getElementById("cliente").innerText = "Cliente: " + cliente;
+document.getElementById("total").innerText = "Total: $" + total;
 function enviarWhatsApp() {
-    let mensaje = "Factura N° " + numero + " - Total: $" + total;
+    let mensaje =
+`🧾 FACTURA
+
+N°: ${numero}
+Cliente: ${cliente}
+Fecha: ${fecha}
+
+Producto: ${producto}
+Cantidad: ${cantidad}
+Subtotal: $${subtotal}
+
+TOTAL: $${total}
+
+¡Gracias por su compra!`;
 
     let url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(mensaje);
 
