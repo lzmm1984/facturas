@@ -17,7 +17,7 @@
 
         .factura {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             max-width: 600px;
             margin: auto;
@@ -26,35 +26,37 @@
 
         .logo {
             width: 100%;
-            max-width: 400px;
+            max-width: 280px;
             height: auto;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 10px auto;
             display: block;
         }
 
         h2 {
-            margin: 10px 0;
+            margin: 8px 0;
             color: #333;
             border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
+            font-size: 20px;
         }
 
         .dato {
-            margin: 8px 0;
-            font-size: 16px;
+            margin: 5px 0;
+            font-size: 14px;
             text-align: left;
-            padding-left: 20px;
+            padding-left: 15px;
         }
 
         table {
             width: 100%;
-            margin: 20px 0;
+            margin: 12px 0;
             border-collapse: collapse;
+            font-size: 14px;
         }
 
         table th, table td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 6px;
             text-align: left;
         }
 
@@ -69,24 +71,24 @@
 
         .total-section {
             text-align: right;
-            padding-right: 20px;
-            font-size: 18px;
+            padding-right: 15px;
+            font-size: 16px;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 10px;
             color: #333;
         }
 
         .botones {
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .boton {
             display: inline-block;
-            margin: 10px 5px;
-            padding: 12px 20px;
+            margin: 8px 5px;
+            padding: 10px 18px;
             border: none;
             border-radius: 5px;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             text-decoration: none;
             color: white;
@@ -112,14 +114,18 @@
         }
 
         .footer {
-            margin-top: 20px;
-            padding-top: 15px;
+            margin-top: 12px;
+            padding-top: 10px;
             border-top: 2px solid #4CAF50;
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
         }
 
-        /* Ocultar botones al imprimir/generar PDF */
+        .footer p {
+            margin: 3px 0;
+        }
+
+        /* Ocultar botones al generar PDF */
         @media print {
             .botones {
                 display: none;
@@ -130,7 +136,7 @@
 <body>
 
 <div class="factura" id="factura">
-    <!-- Logo de la empresa -->
+    <!-- Logo de la empresa (más pequeño) -->
     <img src="https://customer-assets.emergentagent.com/job_factura-digital-pos/artifacts/oogrw38i_LogoFactura.png" 
          alt="Montana Logo" 
          class="logo">
@@ -145,8 +151,8 @@
         <thead>
             <tr>
                 <th>Producto</th>
-                <th style="text-align: center;">Cantidad</th>
-                <th style="text-align: right;">Subtotal</th>
+                <th style="text-align: center; width: 80px;">Cant.</th>
+                <th style="text-align: right; width: 100px;">Subtotal</th>
             </tr>
         </thead>
         <tbody id="lista">
@@ -156,13 +162,13 @@
     <div class="total-section" id="total"></div>
 
     <div class="footer">
-        <p>¡Gracias por su compra! 🎉</p>
-        <p style="font-size: 12px;">Variedades y Papelería Montana</p>
+        <p><b>¡Gracias por su compra! 🎉</b></p>
+        <p>Variedades y Papelería Montana</p>
     </div>
 
     <!-- Botones (no aparecerán en el PDF) -->
     <div class="botones">
-        <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
+        <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 WhatsApp</button>
         <button class="boton pdf" onclick="generarPDF()">📄 Descargar PDF</button>
     </div>
 </div>
@@ -205,7 +211,7 @@ if (productosRaw && productosRaw.length > 0) {
 document.getElementById("numero").innerHTML = `<b>📋 Factura N°:</b> ${numero}`;
 document.getElementById("cliente").innerHTML = `<b>👤 Cliente:</b> ${cliente}`;
 document.getElementById("fecha").innerHTML = `<b>📅 Fecha:</b> ${fecha}`;
-document.getElementById("total").innerHTML = `<b>TOTAL: $${total}</b>`;
+document.getElementById("total").innerHTML = `TOTAL: $${total}`;
 document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3' style='text-align: center;'>No hay productos</td></tr>";
 
 // Función para enviar por WhatsApp
@@ -224,7 +230,7 @@ function enviarWhatsApp() {
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
-// Función para generar PDF
+// Función para generar PDF (optimizada para 1 página)
 function generarPDF() {
     const element = document.getElementById('factura');
     
@@ -233,15 +239,21 @@ function generarPDF() {
     botones.style.display = 'none';
     
     const opt = {
-        margin: 10,
+        margin: [5, 10, 5, 10],  // Márgenes más pequeños: [top, left, bottom, right]
         filename: `Factura_Montana_${numero}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
             scale: 2,
-            useCORS: true,  // Para permitir cargar el logo desde URL externa
+            useCORS: true,
             logging: false
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        },
+        pagebreak: { mode: 'avoid-all' }  // Evitar saltos de página
     };
 
     // Generar PDF
