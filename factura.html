@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Factura</title>
+    <title>Factura - Montana</title>
+    
+    <!-- Librería para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
         body {
             font-family: Arial;
@@ -15,18 +19,31 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            max-width: 500px;
+            max-width: 600px;
             margin: auto;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
+        .logo {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            margin: 0 auto 20px auto;
+            display: block;
+        }
+
         h2 {
-            margin-bottom: 10px;
+            margin: 10px 0;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
         }
 
         .dato {
-            margin: 5px 0;
+            margin: 8px 0;
             font-size: 16px;
+            text-align: left;
+            padding-left: 20px;
         }
 
         table {
@@ -37,7 +54,7 @@
 
         table th, table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
         }
 
@@ -46,26 +63,79 @@
             color: white;
         }
 
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .total-section {
+            text-align: right;
+            padding-right: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            color: #333;
+        }
+
+        .botones {
+            margin-top: 20px;
+        }
+
         .boton {
-            display: block;
-            margin: 10px 0;
-            padding: 12px;
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 12px 20px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
         }
 
         .whatsapp {
             background: #25D366;
-            color: white;
+        }
+
+        .whatsapp:hover {
+            background: #20BA5A;
+            transform: scale(1.05);
+        }
+
+        .pdf {
+            background: #DC3545;
+        }
+
+        .pdf:hover {
+            background: #C82333;
+            transform: scale(1.05);
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #4CAF50;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Ocultar botones al imprimir/generar PDF */
+        @media print {
+            .botones {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="factura">
-    <h2>🧾 Factura</h2>
+<div class="factura" id="factura">
+    <!-- Logo de la empresa -->
+    <img src="https://customer-assets.emergentagent.com/job_factura-digital-pos/artifacts/oogrw38i_LogoFactura.png" 
+         alt="Montana Logo" 
+         class="logo">
+    
+    <h2>🧾 Factura de Venta</h2>
 
     <div class="dato" id="numero"></div>
     <div class="dato" id="cliente"></div>
@@ -75,17 +145,26 @@
         <thead>
             <tr>
                 <th>Producto</th>
-                <th>Cant</th>
-                <th>Sub Total</th>
+                <th style="text-align: center;">Cantidad</th>
+                <th style="text-align: right;">Subtotal</th>
             </tr>
         </thead>
         <tbody id="lista">
         </tbody>
     </table>
     
-    <div class="dato" id="total"></div>
+    <div class="total-section" id="total"></div>
 
-    <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
+    <div class="footer">
+        <p>¡Gracias por su compra! 🎉</p>
+        <p style="font-size: 12px;">Variedades y Papelería Montana</p>
+    </div>
+
+    <!-- Botones (no aparecerán en el PDF) -->
+    <div class="botones">
+        <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 Enviar por WhatsApp</button>
+        <button class="boton pdf" onclick="generarPDF()">📄 Descargar PDF</button>
+    </div>
 </div>
 
 <script>
@@ -93,7 +172,8 @@ const params = new URLSearchParams(window.location.search);
 
 const numero = params.get("num") || "00000";
 const cliente = params.get("cliente") || "Consumidor Final";
-const fecha = params.get("fecha") || "Sin fecha";
+const fechaCompleta = params.get("fecha") || "Sin fecha";
+const fecha = fechaCompleta.split(" ")[0];
 const total = params.get("total") || "0";
 const productosRaw = params.get("productos") || "";
 
@@ -111,20 +191,27 @@ if (productosRaw && productosRaw.length > 0) {
             const cantidad = datos[1].trim();
             const subtotal = datos[2].trim();
             
-            tablaHtml += `<tr><td>${producto}</td><td>${cantidad}</td><td>$${subtotal}</td></tr>`;
+            tablaHtml += `<tr>
+                <td>${producto}</td>
+                <td style="text-align: center;">${cantidad}</td>
+                <td style="text-align: right;">$${subtotal}</td>
+            </tr>`;
+            
             mensajeProductosWhatsApp += `*Producto:* ${producto}\n*Cantidad:* ${cantidad}\n*Subtotal:* $${subtotal}\n\n`;
         }
     });
 }
 
-document.getElementById("numero").innerHTML = `<b>Factura N°:</b> ${numero}`;
-document.getElementById("cliente").innerHTML = `<b>Cliente:</b> ${cliente}`;
-document.getElementById("fecha").innerHTML = `<b>Fecha:</b> ${fecha}`;
-document.getElementById("total").innerHTML = `<b>Total: $${total}</b>`;
-document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3'>No hay productos</td></tr>";
+document.getElementById("numero").innerHTML = `<b>📋 Factura N°:</b> ${numero}`;
+document.getElementById("cliente").innerHTML = `<b>👤 Cliente:</b> ${cliente}`;
+document.getElementById("fecha").innerHTML = `<b>📅 Fecha:</b> ${fecha}`;
+document.getElementById("total").innerHTML = `<b>TOTAL: $${total}</b>`;
+document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3' style='text-align: center;'>No hay productos</td></tr>";
 
+// Función para enviar por WhatsApp
 function enviarWhatsApp() {
-    let mensaje = `📄 *FACTURA*\n\n` +
+    let mensaje = `🏪 *VARIEDADES Y PAPELERÍA MONTANA*\n` +
+                  `📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
                   `*Cliente:* ${cliente}\n` +
                   `*Fecha:* ${fecha}\n\n` +
@@ -132,9 +219,36 @@ function enviarWhatsApp() {
                   `${mensajeProductosWhatsApp}` +
                   `--------------------------\n` +
                   `*TOTAL: $${total}*\n\n` +
-                  `¡Gracias por su compra!`;
+                  `¡Gracias por su compra! 🎉`;
 
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
+}
+
+// Función para generar PDF
+function generarPDF() {
+    const element = document.getElementById('factura');
+    
+    // Ocultar botones temporalmente
+    const botones = document.querySelector('.botones');
+    botones.style.display = 'none';
+    
+    const opt = {
+        margin: 10,
+        filename: `Factura_Montana_${numero}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            useCORS: true,  // Para permitir cargar el logo desde URL externa
+            logging: false
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Generar PDF
+    html2pdf().set(opt).from(element).save().then(() => {
+        // Mostrar botones nuevamente
+        botones.style.display = 'block';
+    });
 }
 </script>
     
