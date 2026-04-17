@@ -224,8 +224,7 @@ function enviarWhatsApp() {
                   `${mensajeProductosWhatsApp}` +
                   `--------------------------\n` +
                   `*TOTAL: $${total}*\n\n` +
-                  `¡Gracias por su compra! 🎉`
-                  `_Vuelva pronto_`;
+                  `¡Gracias por su compra! 🎉`;
 
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
