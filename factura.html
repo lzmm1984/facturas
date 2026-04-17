@@ -215,7 +215,11 @@ document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3' s
 
 // Función para enviar por WhatsApp
 function enviarWhatsApp() {
+    const telefonoTienda = "3044258788";
     let mensaje = `🏪 *VARIEDADES Y PAPELERÍA MONTANA*\n` +
+                  `📍 Calle Principal #123\n` +
+                  `📞 Contacto: ${telefonoTienda}\n` +
+                  `------------------------------------------\n` +
                   `📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
                   `*Cliente:* ${cliente}\n` +
@@ -224,7 +228,8 @@ function enviarWhatsApp() {
                   `${mensajeProductosWhatsApp}` +
                   `--------------------------\n` +
                   `*TOTAL: $${total}*\n\n` +
-                  `¡Gracias por su compra! 🎉`;
+                  `¡Gracias por su compra! 🎉`
+                  `_Vuelva pronto_`;
 
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
