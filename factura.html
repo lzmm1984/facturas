@@ -178,8 +178,7 @@ const params = new URLSearchParams(window.location.search);
 
 const numero = params.get("num") || "00000";
 const cliente = params.get("cliente") || "Consumidor Final";
-const fechaCompleta = params.get("fecha") || "Sin fecha";
-const fecha = fechaCompleta.split(" ")[0];
+const fechaYHora = params.get("fecha") || "Sin fecha";
 const total = params.get("total") || "0";
 const productosRaw = params.get("productos") || "";
 
@@ -210,7 +209,7 @@ if (productosRaw && productosRaw.length > 0) {
 
 document.getElementById("numero").innerHTML = `<b>📋 Factura N°:</b> ${numero}`;
 document.getElementById("cliente").innerHTML = `<b>👤 Cliente:</b> ${cliente}`;
-document.getElementById("fecha").innerHTML = `<b>📅 Fecha:</b> ${fecha}`;
+document.getElementById("fecha").innerHTML = `<b>📅 Fecha y Hora:</b> ${fechaYHora}`;
 document.getElementById("total").innerHTML = `TOTAL: $${total}`;
 document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3' style='text-align: center;'>No hay productos</td></tr>";
 
@@ -220,7 +219,7 @@ function enviarWhatsApp() {
                   `📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
                   `*Cliente:* ${cliente}\n` +
-                  `*Fecha:* ${fecha}\n\n` +
+                  `*Fecha y Hora:* ${fechaYHora}\n\n` +
                   `--------------------------\n` +
                   `${mensajeProductosWhatsApp}` +
                   `--------------------------\n` +
