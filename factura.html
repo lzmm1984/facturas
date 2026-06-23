@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Factura - Montana</title>
     
-    <!-- Librería para generar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -125,7 +124,6 @@
             margin: 3px 0;
         }
 
-        /* Ocultar botones al generar PDF */
         @media print {
             .botones {
                 display: none;
@@ -136,7 +134,6 @@
 <body>
 
 <div class="factura" id="factura">
-    <!-- Logo de la empresa (más pequeño) -->
     <img src="https://customer-assets.emergentagent.com/job_factura-digital-pos/artifacts/oogrw38i_LogoFactura.png" 
          alt="Montana Logo" 
          class="logo">
@@ -146,6 +143,7 @@
     <div class="dato" id="numero"></div>
     <div class="dato" id="cliente"></div>
     <div class="dato" id="fecha"></div>
+    <div class="dato" id="tipopago"></div>
     
     <table>
         <thead>
@@ -166,7 +164,6 @@
         <p>Variedades y Papelería Montana</p>
     </div>
 
-    <!-- Botones (no aparecerán en el PDF) -->
     <div class="botones">
         <button class="boton whatsapp" onclick="enviarWhatsApp()">📲 WhatsApp</button>
         <button class="boton pdf" onclick="generarPDF()">📄 Descargar PDF</button>
@@ -179,6 +176,8 @@ const params = new URLSearchParams(window.location.search);
 const numero = params.get("num") || "00000";
 const cliente = params.get("cliente") || "Consumidor Final";
 const fechaYHora = params.get("fecha") || "Sin fecha";
+// CAMBIO: Capturamos el tipo de pago desde los parámetros de la URL
+const tipoPago = params.get("tipopago") || "No especificado";
 const total = params.get("total") || "0";
 const productosRaw = params.get("productos") || "";
 
@@ -210,16 +209,19 @@ if (productosRaw && productosRaw.length > 0) {
 document.getElementById("numero").innerHTML = `<b>📋 Factura N°:</b> ${numero}`;
 document.getElementById("cliente").innerHTML = `<b>👤 Cliente:</b> ${cliente}`;
 document.getElementById("fecha").innerHTML = `<b>📅 Fecha y Hora:</b> ${fechaYHora}`;
+// CAMBIO: Inyectamos el texto del tipo de pago en la vista HTML
+document.getElementById("tipopago").innerHTML = `<b>💳 Método de Pago:</b> ${tipoPago}`;
 document.getElementById("total").innerHTML = `TOTAL: $${total}`;
 document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3' style='text-align: center;'>No hay productos</td></tr>";
 
-// Función para enviar por WhatsApp
 function enviarWhatsApp() {
+    // CAMBIO: Añadido el Método de pago al cuerpo del mensaje de WhatsApp
     let mensaje = `🏪 *VARIEDADES Y PAPELERÍA MONTANA*\n` +
                   `📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
                   `*Cliente:* ${cliente}\n` +
-                  `*Fecha y Hora:* ${fechaYHora}\n\n` +
+                  `*Fecha y Hora:* ${fechaYHora}\n` +
+                  `*Método de Pago:* ${tipoPago}\n\n` +
                   `--------------------------\n` +
                   `${mensajeProductosWhatsApp}` +
                   `--------------------------\n` +
@@ -229,16 +231,13 @@ function enviarWhatsApp() {
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
 }
 
-// Función para generar PDF (optimizada para 1 página)
 function generarPDF() {
     const element = document.getElementById('factura');
-    
-    // Ocultar botones temporalmente
     const botones = document.querySelector('.botones');
     botones.style.display = 'none';
     
     const opt = {
-        margin: [5, 10, 5, 10],  // Márgenes más pequeños: [top, left, bottom, right]
+        margin: [5, 10, 5, 10],
         filename: `Factura_Montana_${numero}.pdf`,
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
@@ -252,12 +251,10 @@ function generarPDF() {
             orientation: 'portrait',
             compress: true
         },
-        pagebreak: { mode: 'avoid-all' }  // Evitar saltos de página
+        pagebreak: { mode: 'avoid-all' }
     };
 
-    // Generar PDF
     html2pdf().set(opt).from(element).save().then(() => {
-        // Mostrar botones nuevamente
         botones.style.display = 'block';
     });
 }
