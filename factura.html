@@ -175,10 +175,19 @@ const params = new URLSearchParams(window.location.search);
 const numero = params.get("num") || "00000";
 const cliente = params.get("cliente") || "Consumidor Final";
 const fechaYHora = params.get("fecha") || "Sin fecha";
-// CAMBIO: Capturamos el tipo de pago desde los parámetros de la URL
 const tipoPago = params.get("tipopago") || "No especificado";
-const total = params.get("total") || "0";
+const totalRaw = params.get("total") || "0";
 const productosRaw = params.get("productos") || "";
+
+function formatearMoneda(valorString) {
+    let numeroLimpio = parseFloat(valorString.replace(/,/g, '')) || 0;
+    return new Intl.NumberFormat('es-CO', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(numeroLimpio);
+}
+
+const totalFormateado = formatearMoneda(totalRaw);
 
 let tablaHtml = "";
 let mensajeProductosWhatsApp = "";
@@ -192,15 +201,15 @@ if (productosRaw && productosRaw.length > 0) {
         if (datos.length >= 3) {
             const producto = datos[0].trim();
             const cantidad = datos[1].trim();
-            const subtotal = datos[2].trim();
+            const subtotalFormateado = formatearMoneda(datos[2].trim());
             
             tablaHtml += `<tr>
                 <td>${producto}</td>
                 <td style="text-align: center;">${cantidad}</td>
-                <td style="text-align: right;">$${subtotal}</td>
+                <td style="text-align: right;">$${subtotalFormateado}</td>
             </tr>`;
             
-            mensajeProductosWhatsApp += `*Producto:* ${producto}\n*Cantidad:* ${cantidad}\n*Subtotal:* $${subtotal}\n\n`;
+            mensajeProductosWhatsApp += `*Producto:* ${producto}\n*Cantidad:* ${cantidad}\n*Subtotal:* $${subtotalFormateado}\n\n`;
         }
     });
 }
@@ -208,13 +217,11 @@ if (productosRaw && productosRaw.length > 0) {
 document.getElementById("numero").innerHTML = `<b>📋 Factura N°:</b> ${numero}`;
 document.getElementById("cliente").innerHTML = `<b>👤 Cliente:</b> ${cliente}`;
 document.getElementById("fecha").innerHTML = `<b>📅 Fecha y Hora:</b> ${fechaYHora}`;
-// CAMBIO: Inyectamos el texto del tipo de pago en la vista HTML
 document.getElementById("tipopago").innerHTML = `<b>💳 Método de Pago:</b> ${tipoPago}`;
-document.getElementById("total").innerHTML = `TOTAL: $${total}`;
+document.getElementById("total").innerHTML = `TOTAL: $${totalFormateado}`;
 document.getElementById("lista").innerHTML = tablaHtml || "<tr><td colspan='3' style='text-align: center;'>No hay productos</td></tr>";
 
 function enviarWhatsApp() {
-    // CAMBIO: Añadido el Método de pago al cuerpo del mensaje de WhatsApp
     let mensaje =`📄 *FACTURA*\n\n` +
                   `*N°:* ${numero}\n` +
                   `*Cliente:* ${cliente}\n` +
@@ -223,7 +230,7 @@ function enviarWhatsApp() {
                   `--------------------------\n` +
                   `${mensajeProductosWhatsApp}` +
                   `--------------------------\n` +
-                  `*TOTAL: $${total}*\n\n` +
+                  `*TOTAL: $${totalFormateado}*\n\n` +
                   `¡Gracias por su compra! 🎉`;
 
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`, '_blank');
