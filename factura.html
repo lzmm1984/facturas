@@ -182,8 +182,8 @@ const productosRaw = params.get("productos") || "";
 function formatearMoneda(valorString) {
     let numeroLimpio = parseFloat(valorString.replace(/,/g, '')) || 0;
     return new Intl.NumberFormat('es-CO', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
     }).format(numeroLimpio);
 }
 
