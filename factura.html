@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Factura - Montana</title>
+    <title>Factura</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
@@ -243,7 +243,7 @@ function generarPDF() {
     
     const opt = {
         margin: [5, 10, 5, 10],
-        filename: `Factura_Montana_${numero}.pdf`,
+        filename: `Factura_${numero}.pdf`,
         image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
             scale: 2,
